@@ -1,27 +1,40 @@
-import { ConfigModule } from '@nestjs/config';
-import * as Joi from 'joi';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Module } from '@nestjs/common';
 import { TasksModule } from './tasks/tasks.module';
-import { DatabaseModule } from './database/database.module';
 import { DataSource } from 'typeorm';
 import { AuthModule } from './auth/auth.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { configValidationSchema } from './config.schema';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true,
-      envFilePath: '.env',
-      validationSchema: Joi.object({
-        POSTGRES_HOST: Joi.string().required(),
-        POSTGRES_PORT: Joi.number().default(5432).required(),
-        POSTGRES_USER: Joi.string().required(),
-        POSTGRES_PASSWORD: Joi.string().required(),
-        POSTGRES_DB: Joi.string().required(),
-        PORT: Joi.number(),
-      }),
+      envFilePath: [`.env.stage.${process.env.STAGE}`],
+      validationSchema: configValidationSchema,
+    }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => {
+        const isProduction = configService.get('STAGE') === 'prod';
+
+        return {
+          ssl: isProduction,
+          extra: {
+            ssl: isProduction ? { rejectUnauthorized: false } : null,
+          },
+          type: 'postgres',
+          autoLoadEntities: true,
+          synchronize: true,
+          host: configService.get('POSTGRES_HOST'),
+          port: configService.get('POSTGRES_PORT'),
+          username: configService.get('POSTGRES_USER'),
+          password: configService.get('POSTGRES_PASSWORD'),
+          database: configService.get('POSTGRES_DB'),
+        };
+      },
     }),
     TasksModule,
-    DatabaseModule,
     AuthModule,
   ],
   controllers: [],

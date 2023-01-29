@@ -1,3 +1,4 @@
+import { ConfigService } from '@nestjs/config';
 import { User } from './../auth/entity/user.entity';
 import { UseGuards } from '@nestjs/common/decorators/core/use-guards.decorator';
 import { CreateTaskDto } from './dto/create-task.dto';
@@ -14,6 +15,7 @@ import { GetUser } from 'src/auth/get-user.decorator';
 @UseGuards(JwtAuthGuard)
 export class TasksController {
   private logger = new Logger('TasksController');
+
   constructor(private tasksService: TasksService) {}
 
   @Get()
