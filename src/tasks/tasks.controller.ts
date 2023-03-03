@@ -1,4 +1,3 @@
-import { ConfigService } from '@nestjs/config';
 import { User } from './../auth/entity/user.entity';
 import { UseGuards } from '@nestjs/common/decorators/core/use-guards.decorator';
 import { CreateTaskDto } from './dto/create-task.dto';
@@ -8,8 +7,8 @@ import { Controller, Get, Post, Delete, Logger } from '@nestjs/common';
 import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
 import UpdateTaskStatusDto from './dto/update-task-status.dto';
 import { Task } from './entity/task.entity';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { GetUser } from 'src/auth/get-user.decorator';
+import { JwtAuthGuard } from './../auth/jwt-auth.guard';
+import { GetUser } from './../auth/get-user.decorator';
 
 @Controller('tasks')
 @UseGuards(JwtAuthGuard)
@@ -31,13 +30,13 @@ export class TasksController {
     return this.tasksService.getTasks(filterDto, user);
   }
 
-  // //http:/localhost:3000/api/task/sd1sa2d1
+  //http:/localhost:3000/api/task/sd1sa2d1
   @Get(':id')
   getTaskById(@Param('id') id: string, @GetUser() user: User): Promise<Task> {
     return this.tasksService.getTaskById(id, user);
   }
 
-  @Post()
+  @Post('/create') //http:/localhost:3000/api/task/create
   createTask(
     @Body() createTaskDto: CreateTaskDto,
     @GetUser() user: User,

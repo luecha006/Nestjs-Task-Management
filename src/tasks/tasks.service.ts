@@ -1,6 +1,4 @@
-import { GetUser } from './../auth/get-user.decorator';
 import { User } from './../auth/entity/user.entity';
-import { Repository } from 'typeorm';
 import { Task } from './entity/task.entity';
 import { TasksRepository } from './entity/task.repository';
 import { NotFoundException } from '@nestjs/common/exceptions';
@@ -11,7 +9,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { FindOptionsWhere } from 'typeorm';
-import { use } from 'passport';
 
 @Injectable()
 export class TasksService {
